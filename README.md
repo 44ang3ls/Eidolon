@@ -1,2 +1,2 @@
 # Eidolon
- An image editor/processor
+ An image editor/processor that will utilize SDL2, OpenGL, and ImGui
