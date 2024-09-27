@@ -66,7 +66,7 @@ int main(int, char**) {
 
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once); // Fixed position
         ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once); // Fixed size
-        ImGui::Begin("Fixed Window", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+        ImGui::Begin("Fixed Window", nullptr, 0);
 
         // Window contents
         ImGui::Text("Fixed pos");
