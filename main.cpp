@@ -6,12 +6,17 @@
 #include "imgui\imgui_impl_sdl2.h"
 #include "imgui\imgui_impl_opengl3.h"
 
+#include "src/gui.h"
+
 #undef main
 
-const char* version_id = "Eidolon prototype 0.0.1a";
+const char* version_designation = " Prototype ";
+//const char* version_id = "0.0.1a";
+
+char full_name[32];
+
 
 int main(int, char**) {
-
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Window* window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
@@ -52,7 +57,7 @@ int main(int, char**) {
         ImGui::End();
 
         ImGui::Begin("2");
-        ImGui::Text("hhhhhhhhhhhhhhhhhhhhhhhhhh");
+        ImGui::Text("177013");
         ImGui::End();
 
         ImGui::Begin("iiiiiiiiiiiiii");
@@ -60,7 +65,7 @@ int main(int, char**) {
         ImGui::End();
 
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once); // Fixed position
-        ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Once); // Fixed size
+        ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once); // Fixed size
         ImGui::Begin("Fixed Window", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
         // Window contents
@@ -68,8 +73,14 @@ int main(int, char**) {
         ImGui::Button("A Button", ImVec2(100, 30));
         static char buffer[128] = "input text";
         ImGui::InputText("inp", buffer, IM_ARRAYSIZE(buffer), 0);
+        static float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+        ImGui::ColorEdit4("color wheel", color);
+
         ImGui::End();
 
+
+        createSomething();
 
         // Render
         ImGui::Render();
