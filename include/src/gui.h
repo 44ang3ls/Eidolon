@@ -12,7 +12,7 @@
 #include "imgui\imgui_impl_sdlrenderer2.h"
 
 
-// creates a basic ImGui element, can add a vector of functions to execute in order 
+// creates a basic ImGui element, can add a vector of functions to execute in order, call std::bind when giving the functions argument, supply function args in 
 void createBasicGuiElement(bool set_size, ImVec2 size = { 100, 100 }, ImVec2 position = { 0, 0 }, ImGuiCond_ size_flags = ImGuiCond_None, ImGuiCond_ pos_flags = ImGuiCond_None, const char* title = "", ImGuiWindowFlags flags = 0, std::vector<std::function<void()>> functions = {}, bool* open = 0, float alpha = 1.0f) {
         
     if (set_size) {
