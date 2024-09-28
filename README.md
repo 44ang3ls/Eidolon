@@ -6,6 +6,7 @@
 
 --Credits--
 
+ - SDL
  - ImGui https://github.com/ocornut/imgui
  - ImFileDialog https://github.com/dfranx/ImFileDialog
  - Stb library https://github.com/nothings/stb 
