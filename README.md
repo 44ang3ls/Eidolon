@@ -9,4 +9,4 @@
  - Stb library https://github.com/nothings/stb 
 
 
-current version 0.0.1a prototype
+current version 0.0.1b prototype
