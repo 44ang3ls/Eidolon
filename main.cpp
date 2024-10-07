@@ -10,11 +10,18 @@
 #include "src/gui.h"
 #include "src/globals.h"
 
-// undefine main or else sdl gets angry
+// undefine main at start or else sdl gets angry and tries too kill me
 #undef main
 
 
 int main(int, char**) {
+    
+    int SURFACE_X = 500;
+    int SURFACE_Y = 300;
+
+    int SURFACE_WIDTH = 400;
+    int SURFACE_HEIGHT = 400;
+
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Window* window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
@@ -25,10 +32,11 @@ int main(int, char**) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 
-    SDL_Surface* surface_example = IMG_Load("textures/q1.png");
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface_example);
+    SDL_Surface* surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
+    SDL_FillRect(surface_example, NULL, SDL_MapRGB(surface_example->format, 255, 255, 255));
 
-    SDL_FreeSurface(surface_example);
+
+    //SDL_FreeSurface(surface_example);
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -37,53 +45,67 @@ int main(int, char**) {
 
     // main loop
     bool running = true;
+    bool isDrawing = false;
 
-    double angle = 0.0f;
+    int lastX = 0;
+    int lastY = 0;
+
 
     while (running) {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+
             if (event.type == SDL_QUIT)
                 running = false;
-            ImGui_ImplSDL2_ProcessEvent(&event);
+            // Handle mouse button events
+            if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+                isDrawing = true;
+                SDL_GetMouseState(&lastX, &lastY);
+                // Adjust lastX and lastY to the surface area
+                lastX -= SURFACE_X;
+                lastY -= SURFACE_Y;
+            }
+
+            if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
+                isDrawing = false;
+            }
+
+            // Handle mouse motion
+            if (event.type == SDL_MOUSEMOTION) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                x -= SURFACE_X; // Adjust to the surface area
+                y -= SURFACE_Y;
+
+                // Draw a pixel on the surface if within bounds and if the button is pressed
+                if (isDrawing) {
+                    if (x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
+                        SDL_Rect rect = { x, y, 1, 1 }; // Width and height of 1 pixel
+                        SDL_Rect rect_b = { lastX, lastY, 1, 1 };
+                        SDL_FillRect(surface_example, &rect, SDL_MapRGB(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f));
+                        SDL_FillRect(surface_example, &rect_b, SDL_MapRGB(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f));
+                    }
+
+                    // Optionally draw a line between the last position and the current position
+                    if (lastX >= 0 && lastY >= 0 && x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
+                        SDL_RenderDrawLine(renderer, x, y, lastX, lastY);
+                    }
+
+                    //std::cout << lastX << "\n";
+                    lastX = x; // Update last position
+                    lastY = y; // Update last position
+                }
+            }
         }
 
-        angle += 1.0f;
-        angle = fmod(angle, 360.0);
+        ImGui_ImplSDL2_ProcessEvent(&event);
 
         // start the imgui frame
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-
-        // gui code goes here
-        ImGui::Begin("hiiii");
-        ImGui::Text("hi");
-        ImGui::End();
-
-        ImGui::Begin("2");
-        ImGui::Text("177013");
-        ImGui::End();
-
-        ImGui::Begin("iiiiiiiiiiiiii");
-        ImGui::Text("what the what the");
-        ImGui::End();
-
-
-        int DATA_SIZE = 2;
-
-        float data[2] = { 0.0f };
-
-        for (int i = 0; i < DATA_SIZE - 1; i++) {
-            data[i] = data[i + 1];
-        }
-
-        data[DATA_SIZE - 1] = angle;
-
-        ImGui::Begin("CURRENT STABILITY");
-        ImGui::PlotLines("CURRENT STABILITY", data, 2);
-        ImGui::End();
 
 
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once); // Fixed position
@@ -101,9 +123,6 @@ int main(int, char**) {
         ImGui::End();
 
 
-        createSomething();
-
-
         // renderer
         ImGui::Render();
 
@@ -111,10 +130,10 @@ int main(int, char**) {
         SDL_SetRenderDrawColor(renderer, 115, 140, 153, 1);
         SDL_RenderClear(renderer);
 
-
-
-        SDL_Rect dstRect = { 600, 310, 200, 200 }; // Position and size
-        SDL_RenderCopyEx(renderer, texture, NULL, &dstRect, angle, NULL, SDL_FLIP_NONE);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface_example);
+        SDL_Rect dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT };
+        SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
+        SDL_DestroyTexture(texture);
 
         // Render ImGui
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
