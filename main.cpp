@@ -82,7 +82,7 @@ int main(int, char**) {
                 // Draw a pixel on the surface if within bounds and if the button is pressed
                 if (isDrawing) {
                     if (x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
-                        SDL_Rect rect = { x, y, 1, 1 }; // Width and height of 1 pixel
+                        SDL_Rect rect = { x, y, 1, 1 };
                         SDL_Rect rect_b = { lastX, lastY, 1, 1 };
                         SDL_FillRect(surface_example, &rect, SDL_MapRGB(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f));
                         SDL_FillRect(surface_example, &rect_b, SDL_MapRGB(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f));
@@ -91,9 +91,9 @@ int main(int, char**) {
                     // Optionally draw a line between the last position and the current position
                     if (lastX >= 0 && lastY >= 0 && x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
                         SDL_RenderDrawLine(renderer, x, y, lastX, lastY);
+                        SDL_RenderDrawLine(renderer, lastX, lastY, x, y);
                     }
 
-                    //std::cout << lastX << "\n";
                     lastX = x; // Update last position
                     lastY = y; // Update last position
                 }
