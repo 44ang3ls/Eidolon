@@ -1,5 +1,10 @@
 #pragma once
 
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define _CRT_SECURE_NO_WARNINGS
+
+
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
@@ -7,11 +12,13 @@
 #include "imgui\imgui.h"
 #include "imgui\imgui_impl_sdl2.h"
 #include "imgui\imgui_impl_sdlrenderer2.h"
+#include "imgui\ImGuiFileDialog.h"
 #include "src/gui.h"
 #include "src/globals.h"
 
-// undefine main at start or else sdl gets angry and tries too kill me
+// undefine main at start or else sdl gets angry and tries to kill me
 #undef main
+#include "stb_image_write.h"
 
 
 int main(int, char**) {
@@ -23,13 +30,12 @@ int main(int, char**) {
     int SURFACE_HEIGHT = 400;
 
     SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_Window* window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-
+    
+    window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     SDL_SetWindowResizable(window, SDL_bool(true));
 
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 
     SDL_Surface* surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
@@ -59,6 +65,11 @@ int main(int, char**) {
 
             if (event.type == SDL_QUIT)
                 running = false;
+
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_TAB) {
+                SDL_FillRect(surface_example, NULL, 0xFFFFFFFF);
+            }
+
             // Handle mouse button events
             if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 isDrawing = true;
@@ -84,18 +95,21 @@ int main(int, char**) {
                     if (x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
                         SDL_Rect rect = { x, y, 1, 1 };
                         SDL_Rect rect_b = { lastX, lastY, 1, 1 };
-                        SDL_FillRect(surface_example, &rect, SDL_MapRGB(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f));
-                        SDL_FillRect(surface_example, &rect_b, SDL_MapRGB(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f));
+
+                        SDL_FillRect(surface_example, &rect, SDL_MapRGBA(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+                        SDL_FillRect(surface_example, &rect_b, SDL_MapRGBA(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
                     }
 
                     // Optionally draw a line between the last position and the current position
                     if (lastX >= 0 && lastY >= 0 && x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
-                        SDL_RenderDrawLine(renderer, x, y, lastX, lastY);
-                        SDL_RenderDrawLine(renderer, lastX, lastY, x, y);
+                        drawLine(surface_example, x, y, lastX, lastY);
+                        drawLine(surface_example, lastX, lastY, x, y);
                     }
 
                     lastX = x; // Update last position
                     lastY = y; // Update last position
+
+                    std::cout << lastX << " : " << lastY << "\n";
                 }
             }
         }
@@ -121,6 +135,37 @@ int main(int, char**) {
         ImGui::ColorEdit4("color wheel", current_color);
 
         ImGui::End();
+
+
+
+        ImGui::Begin("Save", nullptr, 0);
+
+        if (ImGui::Button("Save Image")) {
+            std::cout << "clicky!!!\n";
+            IGFD::FileDialogConfig config; config.path = "C:/Users/PJWid/OneDrive/Pictures";
+            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png", config);
+
+        }
+
+        ImGui::End();
+
+        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) { // will show a dialog
+            if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                // action
+                std::cout << filePathName << "\n";
+                SDL_Surface* converted_surf = SDL_ConvertSurfaceFormat(surface_example, SDL_PIXELFORMAT_RGBA32, 0);
+
+                std::cout << SDL_GetError() << "\n";
+
+
+                stbi_write_png(filePathName.c_str(), converted_surf->w, converted_surf->h, 4, converted_surf->pixels, converted_surf->w * 4);
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+        }
 
 
         // renderer
@@ -151,4 +196,5 @@ int main(int, char**) {
     SDL_Quit();
 
     return 0;
+
 }

@@ -8,8 +8,7 @@
 #include <functional>
 #include "globals.h"
 #include "imgui\imgui.h"
-#include "imgui\imgui_impl_sdl2.h"
-#include "imgui\imgui_impl_sdlrenderer2.h"
+#include <SDL_surface.h>
 
 
 // creates a basic ImGui element, can add a vector of functions to execute in order, call std::bind when giving the functions argument, supply function args in 
@@ -31,6 +30,33 @@ void createBasicGuiElement(bool set_size, ImVec2 size = { 100, 100 }, ImVec2 pos
     }
 
     ImGui::End();
+}
+
+void drawLine(SDL_Surface* surface, int x0, int y0, int x1, int y1) {
+    int dx = abs(x1 - x0);
+    int dy = abs(y1 - y0);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+
+    while (true) {
+
+        SDL_Rect rect = { x0, y0, 1, 1 };
+        SDL_FillRect(surface, &rect, SDL_MapRGBA(surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+
+        // Check for the end condition
+        if (x0 == x1 && y0 == y1) break;
+
+        int err2 = err * 2;
+        if (err2 > -dy) {
+            err -= dy;
+            x0 += sx;
+        }
+        if (err2 < dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
 }
 
 // test function

@@ -133,8 +133,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\glad.c" />
-    <ClCompile Include="include\imgui\ImFileDialog.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\ImGuiFileDialog.cpp" />
     <ClCompile Include="include\imgui\imgui_demo.cpp" />
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_sdl2.cpp" />
@@ -144,6 +144,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\dirent.h" />
+    <ClInclude Include="include\imgui\ImGuiFileDialog.h" />
+    <ClInclude Include="include\imgui\ImGuiFileDialogConfig.h" />
     <ClInclude Include="include\src\globals.h" />
     <ClInclude Include="include\src\gui.h" />
     <ClInclude Include="include\src\render.hpp" />

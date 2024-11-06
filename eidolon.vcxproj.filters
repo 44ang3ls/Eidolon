@@ -39,10 +39,10 @@
     <ClCompile Include="include\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\ImFileDialog.cpp">
+    <ClCompile Include="include\imgui\imgui_impl_sdlrenderer2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\imgui\imgui_impl_sdlrenderer2.cpp">
+    <ClCompile Include="include\imgui\ImGuiFileDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,6 +63,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\src\render.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\ImGuiFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\ImGuiFileDialogConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
