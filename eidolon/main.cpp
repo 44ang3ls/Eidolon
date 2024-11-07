@@ -161,6 +161,8 @@ int main(int, char**) {
 
 
                 stbi_write_png(filePathName.c_str(), converted_surf->w, converted_surf->h, 4, converted_surf->pixels, converted_surf->w * 4);
+
+                SDL_FreeSurface(converted_surf);
             }
 
             // close
