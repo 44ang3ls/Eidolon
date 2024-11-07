@@ -83,6 +83,19 @@ int main(int, char**) {
                 isDrawing = false;
             }
 
+            if (event.type == SDL_MOUSEWHEEL) {
+                if (event.wheel.y > 0) {
+                    scroll_amt *= 2.0;
+                }
+                else if (event.wheel.y < 0) {
+                    scroll_amt *= 0.9;
+                }
+
+                if (scroll_amt <= 0) {
+                    scroll_amt = 1.0f;
+                }
+            }
+
             // Handle mouse motion
             if (event.type == SDL_MOUSEMOTION) {
                 int x, y;
@@ -142,7 +155,7 @@ int main(int, char**) {
 
         if (ImGui::Button("Save Image")) {
             std::cout << "clicky!!!\n";
-            IGFD::FileDialogConfig config; config.path = "C:/Users/PJWid/OneDrive/Pictures";
+            IGFD::FileDialogConfig config; config.path = "C:/";
             ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png", config);
 
         }
@@ -173,13 +186,27 @@ int main(int, char**) {
         // renderer
         ImGui::Render();
 
+
+        if (scroll_amt <= 0) {
+            scroll_amt = 0.1f;
+        }
+
         // clear the screen, render after this
         SDL_SetRenderDrawColor(renderer, 115, 140, 153, 1);
         SDL_RenderClear(renderer);
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface_example);
-        SDL_Rect dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT };
-        SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
+        SDL_Rect src_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT};
+        SDL_Rect dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT};
+
+        SURFACE_X *= scroll_amt;
+        SURFACE_Y *= scroll_amt;
+        dst_rect.w = (int)(SURFACE_WIDTH * scroll_amt);
+        dst_rect.h = (int)(SURFACE_HEIGHT * scroll_amt);
+
+        std::cout << scroll_amt << "\n";
+
+        SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect);
         SDL_DestroyTexture(texture);
 
         // Render ImGui

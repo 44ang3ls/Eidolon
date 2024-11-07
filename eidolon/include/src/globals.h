@@ -15,5 +15,7 @@ SDL_Window* window;
 
 SDL_Renderer* renderer;
 
+int scroll_amt = 1.0f;
+
 
 #endif
