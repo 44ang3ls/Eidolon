@@ -77,6 +77,9 @@ int main(int, char**) {
                 // Adjust lastX and lastY to the surface area
                 lastX -= SURFACE_X;
                 lastY -= SURFACE_Y;
+
+                lastX /= scroll_amt;
+                lastY /= scroll_amt;
             }
 
             if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
@@ -102,6 +105,9 @@ int main(int, char**) {
                 SDL_GetMouseState(&x, &y);
                 x -= SURFACE_X; // Adjust to the surface area
                 y -= SURFACE_Y;
+
+                x /= scroll_amt;
+                y /= scroll_amt;
 
                 // Draw a pixel on the surface if within bounds and if the button is pressed
                 if (isDrawing) {
@@ -197,12 +203,10 @@ int main(int, char**) {
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface_example);
         SDL_Rect src_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT};
-        SDL_Rect dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT};
+        SDL_Rect dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
 
         SURFACE_X *= scroll_amt;
         SURFACE_Y *= scroll_amt;
-        dst_rect.w = (int)(SURFACE_WIDTH * scroll_amt);
-        dst_rect.h = (int)(SURFACE_HEIGHT * scroll_amt);
 
         std::cout << scroll_amt << "\n";
 
