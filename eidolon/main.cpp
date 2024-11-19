@@ -168,6 +168,29 @@ int main(int, char**) {
 
         ImGui::End();
 
+
+        ImGui::Begin("New", nullptr, 0);
+
+        static char width_buffer[128] = "400";
+        ImGui::InputText("Width", width_buffer, IM_ARRAYSIZE(width_buffer), 0);
+        static char height_buffer[128] = "500";
+        ImGui::InputText("Height", height_buffer, IM_ARRAYSIZE(height_buffer), 0);
+
+        if (ImGui::Button("New Image")) {
+            SDL_FreeSurface(surface_example);
+            surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
+            SDL_FillRect(surface_example, NULL, 0xFFFFFFFF);
+            SURFACE_WIDTH = atoi(width_buffer);
+            SURFACE_HEIGHT = atoi(height_buffer);
+
+
+
+            std::cout << SURFACE_WIDTH << "\n";
+            std::cout << SURFACE_HEIGHT << "\n";
+        }
+
+        ImGui::End();
+
         if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) { // will show a dialog
             if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -208,7 +231,7 @@ int main(int, char**) {
         SURFACE_X *= scroll_amt;
         SURFACE_Y *= scroll_amt;
 
-        std::cout << scroll_amt << "\n";
+        //std::cout << scroll_amt << "\n";
 
         SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect);
         SDL_DestroyTexture(texture);
@@ -228,6 +251,6 @@ int main(int, char**) {
     SDL_DestroyWindow(window);
     SDL_Quit();
 
-    return 0;
 
+    return 0;
 }
