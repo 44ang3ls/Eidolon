@@ -15,6 +15,8 @@ SDL_Window* window;
 
 SDL_Renderer* renderer;
 
+SDL_Surface* drawing_surface;
+
 int scroll_amt = 1.0f;
 
 int SURFACE_X = 400;

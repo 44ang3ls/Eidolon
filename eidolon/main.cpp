@@ -15,6 +15,7 @@
 #include "imgui\ImGuiFileDialog.h"
 #include "src/gui.h"
 #include "src/globals.h"
+#include "src/render.hpp"
 
 // undefine main at start or else sdl gets angry and tries to kill me
 #undef main
@@ -24,25 +25,7 @@
 int main(int, char**) {
     
 
-    SDL_Init(SDL_INIT_EVERYTHING);
-    
-    window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-
-    SDL_SetWindowResizable(window, SDL_bool(true));
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-
-    SDL_Surface* surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
-    SDL_FillRect(surface_example, NULL, SDL_MapRGB(surface_example->format, 255, 255, 255));
-
-
-    //SDL_FreeSurface(surface_example);
-
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui_ImplSDLRenderer2_Init(renderer);
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+    renderInit();
 
     // main loop
     bool running = true;
@@ -62,7 +45,7 @@ int main(int, char**) {
                 running = false;
 
             if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_TAB) {
-                SDL_FillRect(surface_example, NULL, 0xFFFFFFFF);
+                SDL_FillRect(drawing_surface, NULL, 0xFFFFFFFF);
             }
 
             // Handle mouse button events
@@ -110,14 +93,14 @@ int main(int, char**) {
                         SDL_Rect rect = { x, y, 1, 1 };
                         SDL_Rect rect_b = { lastX, lastY, 1, 1 };
 
-                        SDL_FillRect(surface_example, &rect, SDL_MapRGBA(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
-                        SDL_FillRect(surface_example, &rect_b, SDL_MapRGBA(surface_example->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+                        SDL_FillRect(drawing_surface, &rect, SDL_MapRGBA(drawing_surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+                        SDL_FillRect(drawing_surface, &rect_b, SDL_MapRGBA(drawing_surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
                     }
 
                     // Optionally draw a line between the last position and the current position
                     if (lastX >= 0 && lastY >= 0 && x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
-                        drawLine(surface_example, x, y, lastX, lastY);
-                        drawLine(surface_example, lastX, lastY, x, y);
+                        drawLine(drawing_surface, x, y, lastX, lastY);
+                        drawLine(drawing_surface, lastX, lastY, x, y);
                     }
 
                     lastX = x; // Update last position
@@ -129,61 +112,8 @@ int main(int, char**) {
         }
 
         ImGui_ImplSDL2_ProcessEvent(&event);
-
-        // start the imgui frame
-        ImGui_ImplSDLRenderer2_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once); // Fixed position
-        ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once); // Fixed size
-        ImGui::Begin("Fixed Window", nullptr, 0);
-
-        // windows content
-        ImGui::Text("Fixed pos");
-        ImGui::Button("A Button", ImVec2(100, 30));
-        static char buffer[128] = "input text";
-        ImGui::InputText("inp", buffer, IM_ARRAYSIZE(buffer), 0);
-
-        ImGui::ColorEdit4("color wheel", current_color);
-
-        ImGui::End();
-
-
-
-        ImGui::Begin("Save", nullptr, 0);
-
-        if (ImGui::Button("Save Image")) {
-            std::cout << "clicky!!!\n";
-            IGFD::FileDialogConfig config; config.path = "C:/";
-            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png", config);
-
-        }
-
-        ImGui::End();
-
-
-        ImGui::Begin("New", nullptr, 0);
-
-        static char width_buffer[128] = "400";
-        ImGui::InputText("Width", width_buffer, IM_ARRAYSIZE(width_buffer), 0);
-        static char height_buffer[128] = "500";
-        ImGui::InputText("Height", height_buffer, IM_ARRAYSIZE(height_buffer), 0);
-
-        if (ImGui::Button("New Image")) {
-            SDL_FreeSurface(surface_example);
-            SURFACE_WIDTH = atoi(width_buffer);
-            SURFACE_HEIGHT = atoi(height_buffer);
-            surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
-            SDL_FillRect(surface_example, NULL, 0xFFFFFFFF);
-
-
-            std::cout << SURFACE_WIDTH << "\n";
-            std::cout << SURFACE_HEIGHT << "\n";
-        }
-
-        ImGui::End();
+        
+        renderGui();
 
         if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) { // will show a dialog
             if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
@@ -191,7 +121,7 @@ int main(int, char**) {
                 std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
                 // action
                 std::cout << filePathName << "\n";
-                SDL_Surface* converted_surf = SDL_ConvertSurfaceFormat(surface_example, SDL_PIXELFORMAT_RGBA32, 0);
+                SDL_Surface* converted_surf = SDL_ConvertSurfaceFormat(drawing_surface, SDL_PIXELFORMAT_RGBA32, 0);
 
                 std::cout << SDL_GetError() << "\n";
 
@@ -217,10 +147,10 @@ int main(int, char**) {
         // clear the screen, render after this
         SDL_SetRenderDrawColor(renderer, 115, 140, 153, 1);
         SDL_RenderClear(renderer);
-
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface_example);
+           
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
         SDL_Rect src_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT};
-        SDL_Rect dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
+        SDL_Rect dst_rect = { (1280 - SURFACE_WIDTH) /2, (720 - SURFACE_HEIGHT) / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
 
         SURFACE_X *= scroll_amt;
         SURFACE_Y *= scroll_amt;
