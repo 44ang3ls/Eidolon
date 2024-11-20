@@ -3,6 +3,7 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define _CRT_SECURE_NO_WARNINGS
+#define NOMINMAX
 
 
 #include <iostream>
@@ -34,6 +35,8 @@ int main(int, char**) {
     int lastX = 0;
     int lastY = 0;
 
+    SDL_Surface* debug_surface = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
+
 
     while (running) {
         SDL_Event event;
@@ -51,6 +54,9 @@ int main(int, char**) {
             // Handle mouse button events
             if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 isDrawing = true;
+                int r_x, r_y;
+                SDL_GetMouseState(&r_x, &r_y);
+                std::cout << "RAWMOUSESTATE : " << r_x << " : " << r_y << "\n";
                 SDL_GetMouseState(&lastX, &lastY);
                 // Adjust lastX and lastY to the surface area
                 lastX -= SURFACE_X;
@@ -58,6 +64,7 @@ int main(int, char**) {
 
                 lastX /= scroll_amt;
                 lastY /= scroll_amt;
+
             }
 
             if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
@@ -147,18 +154,29 @@ int main(int, char**) {
         // clear the screen, render after this
         SDL_SetRenderDrawColor(renderer, 115, 140, 153, 1);
         SDL_RenderClear(renderer);
-           
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
-        SDL_Rect src_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT};
-        SDL_Rect dst_rect = { (1280 - SURFACE_WIDTH) /2, (720 - SURFACE_HEIGHT) / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
 
-        SURFACE_X *= scroll_amt;
-        SURFACE_Y *= scroll_amt;
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
+        SDL_Rect src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT};
+        SDL_Rect dst_rect = { (1280 - SURFACE_WIDTH) /2, (720 - SURFACE_HEIGHT) / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
+        
+        SURFACE_X = (1280 - SURFACE_WIDTH) / 2;
+        SURFACE_Y = (720 - SURFACE_HEIGHT) / 2;
+
+        SDL_Rect debug_src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
+        SDL_Rect debug_dst_rect = { SURFACE_X, SURFACE_Y , SURFACE_WIDTH, SURFACE_HEIGHT };
+        
+
+        SDL_FillRect(debug_surface, &debug_dst_rect, 1000);
+
+        SDL_Texture* debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
+
+        SDL_RenderCopy(renderer, debug_texture, &debug_src_rect, &debug_dst_rect);
 
         //std::cout << scroll_amt << "\n";
 
         SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect);
         SDL_DestroyTexture(texture);
+        SDL_DestroyTexture(debug_texture);
 
         // Render ImGui
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
