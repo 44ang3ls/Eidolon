@@ -23,11 +23,6 @@
 
 int main(int, char**) {
     
-    int SURFACE_X = 500;
-    int SURFACE_Y = 300;
-
-    int SURFACE_WIDTH = 400;
-    int SURFACE_HEIGHT = 400;
 
     SDL_Init(SDL_INIT_EVERYTHING);
     
@@ -178,11 +173,10 @@ int main(int, char**) {
 
         if (ImGui::Button("New Image")) {
             SDL_FreeSurface(surface_example);
-            surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
-            SDL_FillRect(surface_example, NULL, 0xFFFFFFFF);
             SURFACE_WIDTH = atoi(width_buffer);
             SURFACE_HEIGHT = atoi(height_buffer);
-
+            surface_example = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
+            SDL_FillRect(surface_example, NULL, 0xFFFFFFFF);
 
 
             std::cout << SURFACE_WIDTH << "\n";

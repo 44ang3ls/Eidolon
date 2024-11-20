@@ -17,5 +17,11 @@ SDL_Renderer* renderer;
 
 int scroll_amt = 1.0f;
 
+int SURFACE_X = 400;
+int SURFACE_Y = 400;
+
+int SURFACE_WIDTH = 400;
+int SURFACE_HEIGHT = 400;
+
 
 #endif
