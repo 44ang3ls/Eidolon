@@ -4,7 +4,7 @@
 #define GLOBALS_H
 
 // current version_id
-const char* version_id = "Eidolon Prototype 0.0.1b";
+const char* version_id = "Eidolon Prototype 0.0.2a";
 
 // currently selected color
 static float current_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
