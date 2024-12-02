@@ -37,9 +37,13 @@ int main(int, char**) {
 
     SDL_Surface* debug_surface = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
 
+    int dst_x = 0;
+    int dst_y = 0;
+
 
     while (running) {
         SDL_Event event;
+
 
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
@@ -72,6 +76,17 @@ int main(int, char**) {
             }
 
             if (event.type == SDL_MOUSEWHEEL) {
+                int m_pos_x, m_pos_y; 
+                SDL_GetMouseState(&m_pos_x, &m_pos_y);
+
+                int square_x = (SCREEN_WIDTH - SURFACE_WIDTH) / 2;
+                int square_y = (SCREEN_HEIGHT - SURFACE_HEIGHT) / 2;
+
+                int rel_x, rel_y;
+                rel_x = m_pos_x - square_x;
+                rel_y = m_pos_y - square_y;
+
+
                 if (event.wheel.y > 0) {
                     scroll_amt *= 2.0;
                 }
@@ -82,6 +97,9 @@ int main(int, char**) {
                 if (scroll_amt <= 0) {
                     scroll_amt = 1.0f;
                 }
+
+                dst_x = m_pos_x - (rel_x * scroll_amt);
+                dst_y = m_pos_y - (rel_y * scroll_amt);
             }
 
             // Handle mouse motion
@@ -157,10 +175,13 @@ int main(int, char**) {
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
         SDL_Rect src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT};
-        SDL_Rect dst_rect = { (1280 - SURFACE_WIDTH) /2, (720 - SURFACE_HEIGHT) / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
+        SDL_Rect dst_rect = { dst_x / 2, dst_y / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
         
-        SURFACE_X = (1280 - SURFACE_WIDTH) / 2;
-        SURFACE_Y = (720 - SURFACE_HEIGHT) / 2;
+        //dst_rect.x = fmax(0, fmin(dst_rect.x, SCREEN_WIDTH - dst_rect.w)) * scroll_amt;
+        //dst_rect.y = fmax(0, fmin(dst_rect.y, SCREEN_HEIGHT - dst_rect.y)) * scroll_amt;
+
+        SURFACE_X = dst_x / 2;
+        SURFACE_Y = dst_y / 2;
 
         SDL_Rect debug_src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
         SDL_Rect debug_dst_rect = { SURFACE_X, SURFACE_Y , SURFACE_WIDTH, SURFACE_HEIGHT };

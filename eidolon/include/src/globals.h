@@ -25,5 +25,8 @@ int SURFACE_Y = 400;
 int SURFACE_WIDTH = 400;
 int SURFACE_HEIGHT = 400;
 
+int SCREEN_WIDTH = 1280;
+int SCREEN_HEIGHT = 720;
+
 
 #endif
