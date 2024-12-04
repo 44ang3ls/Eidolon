@@ -1,5 +1,6 @@
 #pragma once
 #include <imgui\imgui_impl_sdl2.h>
+#include <SDL_surface.h>
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
@@ -17,7 +18,11 @@ SDL_Renderer* renderer;
 
 SDL_Surface* drawing_surface;
 
+SDL_Surface* debug_surface;
+
 int scroll_amt = 1.0f;
+int dst_x = 0;
+int dst_y = 0;
 
 int SURFACE_X = 400;
 int SURFACE_Y = 400;

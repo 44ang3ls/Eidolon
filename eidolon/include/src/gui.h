@@ -64,16 +64,50 @@ void createSomething() {
     createBasicGuiElement(true, { 200, 200 }, { 300, 175 }, ImGuiCond_Once, ImGuiCond_Once, "test", 0, { std::bind(ImGui::Text, "hello this is a test"), std::bind(ImGui::Text, "moar text :3"), std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color)}, 0, 1.0f);
 }
 
-class GuiHandler {
+void savePrompt()
+{
+    if (ImGui::Button("Save Image")) {
+        std::cout << "clicky!!!\n";
+        IGFD::FileDialogConfig config; config.path = "C:/";
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png", config);
 
-    void drawRgbWheel() {
-
-        ImGui::Begin("Fixed Window", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-        ImGui::ColorEdit4("color wheel", current_color);
-        ImGui::End();
     }
-};
+}
 
+// all gui elements used in the program
+void createGuiElements()
+{
+        // start the imgui frame
+    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+
+
+    createBasicGuiElement(true, { 200, 200 }, { 0, 0 }, ImGuiCond_Once, ImGuiCond_Once, "color", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color) }, 0, 1.0f);
+
+    createBasicGuiElement(true, { 100, 50 }, { 200, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Save", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(savePrompt) }, 0, 1.0f);
+
+    ImGui::Begin("New", nullptr, 0);
+
+    static char width_buffer[128] = "400";
+    ImGui::InputText("Width", width_buffer, IM_ARRAYSIZE(width_buffer), 0);
+    static char height_buffer[128] = "500";
+    ImGui::InputText("Height", height_buffer, IM_ARRAYSIZE(height_buffer), 0);
+
+    if (ImGui::Button("New Image")) {
+        SDL_FreeSurface(drawing_surface);
+        SURFACE_WIDTH = atoi(width_buffer);
+        SURFACE_HEIGHT = atoi(height_buffer);
+        drawing_surface = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
+        SDL_FillRect(drawing_surface, NULL, 0xFFFFFFFF);
+
+
+        std::cout << SURFACE_WIDTH << "\n";
+        std::cout << SURFACE_HEIGHT << "\n";
+    }
+
+    ImGui::End();
+}
 
 
 #endif

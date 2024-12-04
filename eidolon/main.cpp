@@ -55,6 +55,22 @@ int main(int, char**) {
                 SDL_FillRect(drawing_surface, NULL, 0xFFFFFFFF);
             }
 
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP) {
+                dst_y -= 5;
+            }
+
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_DOWN) {
+                dst_y += 5;
+            }
+
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_LEFT) {
+                dst_x -= 5;
+            }
+
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RIGHT) {
+                dst_x += 5;
+            }
+
             // Handle mouse button events
             if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 isDrawing = true;
@@ -138,7 +154,7 @@ int main(int, char**) {
 
         ImGui_ImplSDL2_ProcessEvent(&event);
         
-        renderGui();
+        createGuiElements();
 
         if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) { // will show a dialog
             if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
