@@ -9,6 +9,8 @@
 #include "imgui\imgui_impl_sdlrenderer2.h"
 #include "imgui\ImGuiFileDialog.h"
 
+
+// initialize everything we need for rendering, also creates a context for imgui and bind it to SDL2
 void renderInit()
 {
     SDL_Init(SDL_INIT_EVERYTHING);
