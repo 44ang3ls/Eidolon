@@ -185,23 +185,36 @@ int main(int, char**) {
                 int width, height; 
                 int channels;
 
-                void* dat = stbi_load(filePathName.c_str(), &width, &height, &channels, 0);
-
+                void* dat = stbi_load(filePathName.c_str(), &width, &height, &channels, 3);
 
                 std::cout << stbi_failure_reason() << "\n";
 
-                std::cout << width << " : " << height << "\n";
-                std::cout << channels << "\n";
+                if (dat)
+                {
+                    //std::cout << width << " : " << height << "\n";
+                    //std::cout << channels << "\n";
+
+                    //SDL_FreeSurface(drawing_surface);
+
+                    //drawing_surface = SDL_CreateRGBSurfaceFrom(dat, width, height, 32, width * 4, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+                    drawing_surface = SDL_CreateRGBSurfaceWithFormatFrom(dat, width, height, 24, width * channels, SDL_PIXELFORMAT_BGR24);
 
 
-                drawing_surface = SDL_CreateRGBSurfaceFrom(dat, width, height, 32 , width * 4, 0x000000FF, 0x0000FF00, 0x00FF0000, (channels == 4) ? 0xFF000000 : 0);
+                    std::cout << "Potential import errors: " << SDL_GetError() << "\n";
 
-                std::cout << SDL_GetError() << "\n";
+                    std::cout << drawing_surface->w << " : " << drawing_surface->h << "\n";
 
-                SURFACE_HEIGHT = height;
-                SURFACE_WIDTH = width;
+                    SURFACE_HEIGHT = height;
+                    SURFACE_WIDTH = width;
+                }
+                else
+                {
+                    std::cout << stbi_failure_reason() << "\n";
+                }
 
-                stbi_image_free(dat);
+
+                //stbi_image_free(dat);
             }
 
             // close
@@ -221,8 +234,18 @@ int main(int, char**) {
         SDL_SetRenderDrawColor(renderer, 115, 140, 153, 1);
         SDL_RenderClear(renderer);
 
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
-        SDL_Rect src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT};
+        SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR32, 0, 0, 0);
+
+        if (drawing_surface)
+        {
+            texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
+        }
+        else 
+        {
+            std::cout << SDL_GetError() << "\n";
+        }
+
+        SDL_Rect src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
         SDL_Rect dst_rect = { dst_x / 2, dst_y / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
         
 

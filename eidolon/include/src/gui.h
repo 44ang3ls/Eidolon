@@ -67,7 +67,8 @@ void createSomething() {
 
 void savePrompt()
 {
-    if (ImGui::Button("Save Image")) {
+    if (ImGui::Button("Save Image")) 
+    {
         std::cout << "clicky!!!\n";
         IGFD::FileDialogConfig config; config.path = "C:/";
         ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png", config);
@@ -77,7 +78,8 @@ void savePrompt()
 
 void importPrompt()
 {
-    if (ImGui::Button("Import")) {
+    if (ImGui::Button("Import")) 
+    {
         IGFD::FileDialogConfig config; config.path = "C:/";
         ImGuiFileDialog::Instance()->OpenDialog("ChooseImportDlgKey", "Choose File", ".png", config);
 
