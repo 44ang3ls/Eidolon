@@ -265,12 +265,8 @@ int main(int, char**) {
 
         if (drawing_surface)
         {
-            std::cout << "potential texture errors : " << SDL_GetError() << "\n";
+            //std::cout << "potential texture errors : " << SDL_GetError() << "\n";
             texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
-        }
-        else 
-        {
-            std::cout << SDL_GetError() << "\n";
         }
 
         SDL_Rect src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
