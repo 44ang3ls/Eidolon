@@ -182,38 +182,65 @@ int main(int, char**) {
 
                 std::cout << filePathName << "\n";
 
-                int width, height; 
-                int channels;
+                int width, height = 0; 
+                int channels = 0;
+                int rec_channel = STBI_rgb_alpha;
 
-                void* dat = stbi_load(filePathName.c_str(), &width, &height, &channels, 3);
 
-                std::cout << stbi_failure_reason() << "\n";
+                unsigned char* dat = stbi_load(filePathName.c_str(), &width, &height, &channels, rec_channel);
+
+                if (dat == NULL) {
+                    SDL_Log("Loading image failed: %s", stbi_failure_reason());
+                    ImGuiFileDialog::Instance()->Close();
+                }
+
+
+                Uint32 r_mask, g_mask, b_mask, a_mask;
+
+                #if SDL_BYTEORDER == SDL_BIG_ENDIAN // beeg endian
+                    int shift = (req_format == STBI_rgb) ? 8 : 0;
+                    r_mask = 0xff000000 >> shift;
+                    g_mask = 0x00ff0000 >> shift;
+                    b_mask = 0x0000ff00 >> shift;
+                    a_mask = 0x000000ff >> shift;
+                #else // little endian
+                    r_mask = 0x000000FF;
+                    g_mask = 0x0000FF00;
+                    b_mask = 0x00FF0000;
+                    a_mask = (rec_channel == STBI_rgb) ? 0 : 0xFF000000;
+                #endif
+
+
+                int depth, pitch;
+
+                if (rec_channel == STBI_rgb) {
+                    depth = 24;
+                    pitch = 3 * width;
+                }
+                else {
+                    depth = 32;
+                    pitch = 4 * width;
+                }
+
 
                 if (dat)
                 {
-                    //std::cout << width << " : " << height << "\n";
-                    //std::cout << channels << "\n";
-
-                    //SDL_FreeSurface(drawing_surface);
-
-                    //drawing_surface = SDL_CreateRGBSurfaceFrom(dat, width, height, 32, width * 4, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-
-                    drawing_surface = SDL_CreateRGBSurfaceWithFormatFrom(dat, width, height, 24, width * channels, SDL_PIXELFORMAT_BGR24);
-
-
-                    std::cout << "Potential import errors: " << SDL_GetError() << "\n";
-
-                    std::cout << drawing_surface->w << " : " << drawing_surface->h << "\n";
-
                     SURFACE_HEIGHT = height;
                     SURFACE_WIDTH = width;
+
+                    drawing_surface = SDL_CreateRGBSurfaceFrom((void*) dat, width, height, depth, pitch, r_mask, g_mask, 
+                        b_mask, a_mask);
+
+                    std::cout << channels << "\n";
+                    std::cout << "Potential import errors: " << SDL_GetError() << "\n";
+                    std::cout << drawing_surface->w << " : " << drawing_surface->h << "\n";
                 }
                 else
                 {
                     std::cout << stbi_failure_reason() << "\n";
                 }
 
-
+                // eventually free data eventually
                 //stbi_image_free(dat);
             }
 
@@ -238,6 +265,7 @@ int main(int, char**) {
 
         if (drawing_surface)
         {
+            std::cout << "potential texture errors : " << SDL_GetError() << "\n";
             texture = SDL_CreateTextureFromSurface(renderer, drawing_surface);
         }
         else 
@@ -256,7 +284,7 @@ int main(int, char**) {
         SDL_Rect debug_dst_rect = { SURFACE_X, SURFACE_Y , SURFACE_WIDTH, SURFACE_HEIGHT };
         
 
-        SDL_FillRect(debug_surface, &debug_dst_rect, 1000);
+        SDL_FillRect(debug_surface, &debug_dst_rect, 89900);
 
         SDL_Texture* debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
 
