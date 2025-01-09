@@ -44,7 +44,7 @@ void drawLine(SDL_Surface* surface, int x0, int y0, int x1, int y1) {
     while (true) {
 
         SDL_Rect rect = { x0, y0, 1, 1 };
-        SDL_FillRect(surface, &rect, SDL_MapRGBA(surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+        SDL_FillRect(surface, &rect, SDL_MapRGBA(surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3] * 255.0f));
 
         // check for the end condition
         if (x0 == x1 && y0 == y1) break;

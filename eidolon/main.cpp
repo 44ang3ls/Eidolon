@@ -135,8 +135,8 @@ int main(int, char**) {
                         SDL_Rect rect_b = { lastX, lastY, 1, 1 };
 
 
-                        SDL_FillRect(layers[layer_index].layer_data, &rect, SDL_MapRGBA(layers[layer_index].layer_data->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
-                        SDL_FillRect(layers[layer_index].layer_data, &rect_b, SDL_MapRGBA(layers[layer_index].layer_data->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+                        SDL_FillRect(layers[layer_index].layer_data, &rect, SDL_MapRGBA(layers[layer_index].layer_data->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3] * 255.0f));
+                        SDL_FillRect(layers[layer_index].layer_data, &rect_b, SDL_MapRGBA(layers[layer_index].layer_data->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3] * 255.0f));
                     }
 
                     // optionally draw a line between the last position and the current position
@@ -287,7 +287,7 @@ int main(int, char**) {
 
         //SDL_FillRect(debug_surface, &debug_dst_rect, 89900);
 
-        SDL_Texture* debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
+        //SDL_Texture* debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
 
         //SDL_RenderCopy(renderer, debug_texture, &debug_src_rect, &debug_dst_rect);
 

@@ -34,8 +34,8 @@ struct Layer {
 
 	// on creation of a layer create a blank sdl surface
 	Layer(std::string n, float o, bool h) {
-		layer_data = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
-		SDL_FillRect(layer_data, NULL, SDL_MapRGB(layer_data->format, 150, 0, 0));
+		layer_data = SDL_CreateRGBSurfaceWithFormat(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
+		//SDL_FillRect(layer_data, NULL, SDL_MapRGB(layer_data->format, 150, 0, 0));
 
 		name = n;
 		opacity_percent = o;
