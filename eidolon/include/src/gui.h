@@ -88,7 +88,7 @@ void layerView()
     }
 }
 
-void importPrompt()
+void importPrompt() 
 {
     if (ImGui::Button("Import")) 
     {
@@ -109,7 +109,7 @@ void createGuiElements()
     createBasicGuiElement(true, { 200, 200 }, { 0, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Color", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color) }, 0, 1.0f);
     createBasicGuiElement(true, { 100, 50 }, { 200, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Save", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(savePrompt) }, 0, 1.0f);
     createBasicGuiElement(true, { 150, 50 }, { 400, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Import", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(importPrompt) }, 0, 1.0f);
-    createBasicGuiElement(true, { 100, 400 }, { 500, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Layers", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(layerView) });
+    createBasicGuiElement(true, { 100, 400 }, { 500, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Layers", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(layerView) }, 0, 1.0f);
 
 
     ImGui::Begin("New", nullptr, 0);
@@ -125,8 +125,13 @@ void createGuiElements()
         SDL_FreeSurface(drawing_surface);
         SURFACE_WIDTH = atoi(width_buffer);
         SURFACE_HEIGHT = atoi(height_buffer);
-        drawing_surface = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
-        SDL_FillRect(drawing_surface, NULL, 0xFFFFFFFF);
+
+        clearLayers();
+        //drawing_surface = SDL_CreateRGBSurfaceWithFormat(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
+        SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
+
+        Layer("Layer 1", 1.0, false);
+        Layer("Layer 2", 1.0, false);
 
 
         std::cout << SURFACE_WIDTH << "\n";

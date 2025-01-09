@@ -178,6 +178,7 @@ int main(int, char**) {
             ImGuiFileDialog::Instance()->Close();
         }
 
+        // import image
         if (ImGuiFileDialog::Instance()->Display("ChooseImportDlgKey")) { // will show a dialog
             if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
                 std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -230,7 +231,18 @@ int main(int, char**) {
                     SURFACE_HEIGHT = height;
                     SURFACE_WIDTH = width;
 
-                    drawing_surface = SDL_CreateRGBSurfaceFrom((void*) dat, width, height, depth, pitch, r_mask, g_mask, 
+                    //drawing_surface = SDL_CreateRGBSurfaceFrom((void*) dat, width, height, depth, pitch, r_mask, g_mask, 
+                    //    b_mask, a_mask);
+
+                    SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
+
+                    clearLayers();
+                    //for (int i = 0; i)
+
+                    Layer("Layer 1", 1.0, false);
+                    Layer("Layer 2", 1.0, false);
+
+                    layers[0].layer_data = SDL_CreateRGBSurfaceFrom((void*)dat, width, height, depth, pitch, r_mask, g_mask,
                         b_mask, a_mask);
 
                     std::cout << channels << "\n";

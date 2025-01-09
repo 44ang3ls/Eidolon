@@ -48,6 +48,11 @@ struct Layer {
 };
 
 
+void clearLayers()
+{
+	layers.erase(layers.begin(), layers.end());
+}
+
 //std::vector<Layer*> layers;
 
 #endif
