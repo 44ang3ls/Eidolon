@@ -17,6 +17,7 @@
 #include "imgui\ImGuiFileDialog.h"
 #include "src/gui.h"
 #include "src/globals.h"
+#include "src/layers.h"
 #include "src/render.hpp"
 
 // undefine main at start or else sdl gets angry and tries to kill me
@@ -109,7 +110,6 @@ int main(int, char**) {
                 else if (event.wheel.y < 0) {
                     scroll_amt *= 0.9;
                 }
-
                 if (scroll_amt <= 0) {
                     scroll_amt = 1.0f;
                 }
@@ -129,19 +129,21 @@ int main(int, char**) {
                 y /= scroll_amt;
 
                 // draw a pixel on the surface if it is within bounds and if the button is pressed, use line drawing function to draw lines to allow for smoother drawing
-                if (is_drawing) {
+                if (is_drawing ) {
                     if (x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
                         SDL_Rect rect = { x, y, 1, 1 };
                         SDL_Rect rect_b = { lastX, lastY, 1, 1 };
 
-                        SDL_FillRect(drawing_surface, &rect, SDL_MapRGBA(drawing_surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
-                        SDL_FillRect(drawing_surface, &rect_b, SDL_MapRGBA(drawing_surface->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+
+                        SDL_FillRect(layers[layer_index].layer_data, &rect, SDL_MapRGBA(layers[layer_index].layer_data->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
+                        SDL_FillRect(layers[layer_index].layer_data, &rect_b, SDL_MapRGBA(layers[layer_index].layer_data->format, current_color[0] * 255.0f, current_color[1] * 255.0f, current_color[2] * 255.0f, current_color[3]));
                     }
 
                     // optionally draw a line between the last position and the current position
                     if (lastX >= 0 && lastY >= 0 && x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
-                        drawLine(drawing_surface, x, y, lastX, lastY);
-                        drawLine(drawing_surface, lastX, lastY, x, y);
+
+                        drawLine(layers[layer_index].layer_data, x, y, lastX, lastY);
+                        drawLine(layers[layer_index].layer_data, lastX, lastY, x, y);
                     }
 
                     lastX = x; // update last position
@@ -182,7 +184,7 @@ int main(int, char**) {
 
                 std::cout << filePathName << "\n";
 
-                int width, height = 0; 
+                int width, height = 0;
                 int channels = 0;
                 int rec_channel = STBI_rgb_alpha;
 
@@ -263,6 +265,8 @@ int main(int, char**) {
 
         SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR32, 0, 0, 0);
 
+        mergeLayers();
+
         if (drawing_surface)
         {
             //std::cout << "potential texture errors : " << SDL_GetError() << "\n";
@@ -276,15 +280,16 @@ int main(int, char**) {
         SURFACE_X = dst_x / 2;
         SURFACE_Y = dst_y / 2;
 
+
         SDL_Rect debug_src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
-        SDL_Rect debug_dst_rect = { SURFACE_X, SURFACE_Y , SURFACE_WIDTH, SURFACE_HEIGHT };
+        SDL_Rect debug_dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT };
         
 
-        SDL_FillRect(debug_surface, &debug_dst_rect, 89900);
+        //SDL_FillRect(debug_surface, &debug_dst_rect, 89900);
 
         SDL_Texture* debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
 
-        SDL_RenderCopy(renderer, debug_texture, &debug_src_rect, &debug_dst_rect);
+        //SDL_RenderCopy(renderer, debug_texture, &debug_src_rect, &debug_dst_rect);
 
         //std::cout << scroll_amt << "\n";
 
@@ -292,7 +297,7 @@ int main(int, char**) {
 
         // destroy textures at the end of the frame as to not create any potential memory leaks
         SDL_DestroyTexture(texture);
-        SDL_DestroyTexture(debug_texture);
+        //SDL_DestroyTexture(debug_texture);
 
         // render ImGui
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);

@@ -8,6 +8,7 @@
 #include <functional>
 #include "globals.h"
 #include "imgui\imgui.h"
+#include "layers.h"
 #include <SDL_surface.h>
 
 
@@ -76,6 +77,17 @@ void savePrompt()
     }
 }
 
+void layerView()
+{
+    for (int i = 0; i < layers.size(); i++) {
+        bool element_selected = (i == layer_index);
+
+        if (ImGui::Selectable(layers[i].name.c_str(), element_selected)) {
+            layer_index = i;
+        }
+    }
+}
+
 void importPrompt()
 {
     if (ImGui::Button("Import")) 
@@ -94,11 +106,11 @@ void createGuiElements()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    createBasicGuiElement(true, { 200, 200 }, { 0, 0 }, ImGuiCond_Once, ImGuiCond_Once, "color", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color) }, 0, 1.0f);
-
+    createBasicGuiElement(true, { 200, 200 }, { 0, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Color", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color) }, 0, 1.0f);
     createBasicGuiElement(true, { 100, 50 }, { 200, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Save", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(savePrompt) }, 0, 1.0f);
-
     createBasicGuiElement(true, { 150, 50 }, { 400, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Import", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(importPrompt) }, 0, 1.0f);
+    createBasicGuiElement(true, { 100, 400 }, { 500, 0 }, ImGuiCond_Once, ImGuiCond_Once, "Layers", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, { std::bind(layerView) });
+
 
     ImGui::Begin("New", nullptr, 0);
 
@@ -122,8 +134,6 @@ void createGuiElements()
     }
 
     ImGui::End();
-
-
 }
 
 
