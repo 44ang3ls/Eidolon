@@ -74,5 +74,11 @@
     <ClInclude Include="include\imgui\ImGuiFileDialogConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\src\layers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\src\tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

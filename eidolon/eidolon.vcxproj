@@ -149,7 +149,9 @@
     <ClInclude Include="include\imgui\ImGuiFileDialogConfig.h" />
     <ClInclude Include="include\src\globals.h" />
     <ClInclude Include="include\src\gui.h" />
+    <ClInclude Include="include\src\layers.h" />
     <ClInclude Include="include\src\render.hpp" />
+    <ClInclude Include="include\src\tools.h" />
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\stb_image_resize2.h" />
     <ClInclude Include="include\stb_image_write.h" />
