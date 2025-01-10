@@ -2,6 +2,7 @@
 #ifndef GUI_H
 #define GUI_H
 
+
 #include <iostream>
 #include <stdio.h>
 #include <vector>
@@ -59,11 +60,6 @@ void drawLine(SDL_Surface* surface, int x0, int y0, int x1, int y1) {
             y0 += sy;
         }
     }
-}
-
-// test function
-void createSomething() {
-    createBasicGuiElement(true, { 200, 200 }, { 300, 175 }, ImGuiCond_Once, ImGuiCond_Once, "test", 0, { std::bind(ImGui::Text, "hello this is a test"), std::bind(ImGui::Text, "moar text :3"), std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color)}, 0, 1.0f);
 }
 
 void savePrompt()
