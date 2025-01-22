@@ -31,6 +31,8 @@ int main(int, char**) {
 
     renderInit();
 
+    SDL_Surface* debug_surface = SDL_CreateRGBSurfaceWithFormat(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
+
     // main loop
     bool running = true;
     bool is_drawing = false;
@@ -38,7 +40,32 @@ int main(int, char**) {
     int lastX = 0;
     int lastY = 0;
 
-    SDL_Surface* debug_surface = SDL_CreateRGBSurface(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, 0, 0, 0, 0);
+
+    int width, height = 0;
+    int channels = 0;
+
+
+    unsigned char* transparent_dat = stbi_load("./textures/transparent.jpg", &width, &height, &channels, 4);
+
+    if (transparent_dat == NULL) {
+        SDL_Log("Loading image failed: %s", stbi_failure_reason());
+    }
+
+
+    if (transparent_dat)
+    {
+
+        debug_surface = SDL_CreateRGBSurfaceFrom((void*)transparent_dat, width, height, 24, 4 * width, 
+        0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+
+        //std::cout << channels << "\n";
+        std::cout << "Potential import errors: " << SDL_GetError() << "\n";
+        //std::cout << drawing_surface->w << " : " << drawing_surface->h << "\n";
+    }
+    else
+    {
+        std::cout << stbi_failure_reason() << "\n";
+    }
 
     int dst_x = 0;
     int dst_y = 0;
@@ -93,7 +120,7 @@ int main(int, char**) {
 
             // scrolling logic
             if (event.type == SDL_MOUSEWHEEL) {
-                int m_pos_x, m_pos_y; 
+                int m_pos_x, m_pos_y;
                 SDL_GetMouseState(&m_pos_x, &m_pos_y);
 
                 int square_x = (SCREEN_WIDTH - SURFACE_WIDTH) / 2;
@@ -129,7 +156,7 @@ int main(int, char**) {
                 y /= scroll_amt;
 
                 // draw a pixel on the surface if it is within bounds and if the button is pressed, use line drawing function to draw lines to allow for smoother drawing
-                if (is_drawing ) {
+                if (is_drawing) {
                     if (x >= 0 && x < SURFACE_WIDTH && y >= 0 && y < SURFACE_HEIGHT) {
                         SDL_Rect rect = { x, y, 1, 1 };
                         SDL_Rect rect_b = { lastX, lastY, 1, 1 };
@@ -155,7 +182,7 @@ int main(int, char**) {
         }
 
         ImGui_ImplSDL2_ProcessEvent(&event);
-        
+
         createGuiElements();
 
         // file dialog for saving
@@ -201,16 +228,16 @@ int main(int, char**) {
                 Uint32 r_mask, g_mask, b_mask, a_mask;
 
                 #if SDL_BYTEORDER == SDL_BIG_ENDIAN // beeg endian
-                    int shift = (req_format == STBI_rgb) ? 8 : 0;
-                    r_mask = 0xff000000 >> shift;
-                    g_mask = 0x00ff0000 >> shift;
-                    b_mask = 0x0000ff00 >> shift;
-                    a_mask = 0x000000ff >> shift;
+                int shift = (req_format == STBI_rgb) ? 8 : 0;
+                r_mask = 0xff000000 >> shift;
+                g_mask = 0x00ff0000 >> shift;
+                b_mask = 0x0000ff00 >> shift;
+                a_mask = 0x000000ff >> shift;
                 #else // little endian
-                    r_mask = 0x000000FF;
-                    g_mask = 0x0000FF00;
-                    b_mask = 0x00FF0000;
-                    a_mask = (rec_channel == STBI_rgb) ? 0 : 0xFF000000;
+                r_mask = 0x000000FF;
+                g_mask = 0x0000FF00;
+                b_mask = 0x00FF0000;
+                a_mask = (rec_channel == STBI_rgb) ? 0 : 0xFF000000;
                 #endif
 
 
@@ -275,6 +302,7 @@ int main(int, char**) {
         SDL_SetRenderDrawColor(renderer, 115, 140, 153, 1);
         SDL_RenderClear(renderer);
 
+        SDL_Texture* debug_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR32, 0, 0, 0);
         SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR32, 0, 0, 0);
 
         mergeLayers();
@@ -287,29 +315,30 @@ int main(int, char**) {
 
         SDL_Rect src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
         SDL_Rect dst_rect = { dst_x / 2, dst_y / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
-        
+
+
+        SDL_Rect debug_src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
+        SDL_Rect debug_dst_rect = { dst_x / 2, dst_y / 2, SURFACE_WIDTH * scroll_amt, SURFACE_HEIGHT * scroll_amt };
+
 
         SURFACE_X = dst_x / 2;
         SURFACE_Y = dst_y / 2;
 
 
-        SDL_Rect debug_src_rect = { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT };
-        SDL_Rect debug_dst_rect = { SURFACE_X, SURFACE_Y, SURFACE_WIDTH, SURFACE_HEIGHT };
-        
 
         //SDL_FillRect(debug_surface, &debug_dst_rect, 89900);
 
-        //SDL_Texture* debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
+        debug_texture = SDL_CreateTextureFromSurface(renderer, debug_surface);
 
-        //SDL_RenderCopy(renderer, debug_texture, &debug_src_rect, &debug_dst_rect);
 
         //std::cout << scroll_amt << "\n";
 
+        SDL_RenderCopy(renderer, debug_texture, &debug_src_rect, &debug_dst_rect);
         SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect);
 
         // destroy textures at the end of the frame as to not create any potential memory leaks
         SDL_DestroyTexture(texture);
-        //SDL_DestroyTexture(debug_texture);
+        SDL_DestroyTexture(debug_texture);
 
         // render ImGui
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
