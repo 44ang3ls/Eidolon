@@ -207,84 +207,81 @@ int main(int, char**) {
 
         // import image
         if (ImGuiFileDialog::Instance()->Display("ChooseImportDlgKey")) { // will show a dialog
-            if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            if (ImGuiFileDialog::Instance()->IsOk()) {                     // action if OK
+                if (ImGui::BeginPopupModal("Import Image", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 
-                std::cout << filePathName << "\n";
+                    std::cout << filePathName << "\n";
 
-                int width, height = 0;
-                int channels = 0;
-                int rec_channel = STBI_rgb_alpha;
+                    int width, height = 0;
+                    int channels = 0;
+                    int rec_channel = STBI_rgb_alpha;
 
+                    unsigned char* dat = stbi_load(filePathName.c_str(), &width, &height, &channels, rec_channel);
 
-                unsigned char* dat = stbi_load(filePathName.c_str(), &width, &height, &channels, rec_channel);
+                    if (dat == NULL) {
+                        SDL_Log("Loading image failed: %s", stbi_failure_reason());
+                        ImGuiFileDialog::Instance()->Close();
+                    }
 
-                if (dat == NULL) {
-                    SDL_Log("Loading image failed: %s", stbi_failure_reason());
-                    ImGuiFileDialog::Instance()->Close();
+                    Uint32 r_mask, g_mask, b_mask, a_mask;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN  // beeg endian
+                    int shift = (req_format == STBI_rgb) ? 8 : 0;
+                    r_mask = 0xff000000 >> shift;
+                    g_mask = 0x00ff0000 >> shift;
+                    b_mask = 0x0000ff00 >> shift;
+                    a_mask = 0x000000ff >> shift;
+#else  // little endian
+                    r_mask = 0x000000FF;
+                    g_mask = 0x0000FF00;
+                    b_mask = 0x00FF0000;
+                    a_mask = (rec_channel == STBI_rgb) ? 0 : 0xFF000000;
+#endif
+
+                    int depth, pitch;
+
+                    if (rec_channel == STBI_rgb) {
+                        depth = 24;
+                        pitch = 3 * width;
+                    } else {
+                        depth = 32;
+                        pitch = 4 * width;
+                    }
+
+                    if (dat) {
+                        SURFACE_HEIGHT = height;
+                        SURFACE_WIDTH = width;
+
+                        // drawing_surface = SDL_CreateRGBSurfaceFrom((void*) dat, width, height, depth, pitch, r_mask, g_mask,
+                        //     b_mask, a_mask);
+
+                        SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
+
+                        clearLayers();
+                        // for (int i = 0; i)
+
+                        Layer("Layer 1", 1.0, false);
+                        Layer("Layer 2", 1.0, false);
+
+                        layers[0].layer_data = SDL_CreateRGBSurfaceFrom((void*)dat, width, height, depth, pitch, r_mask, g_mask,
+                                                                        b_mask, a_mask);
+
+                        std::cout << channels << "\n";
+                        std::cout << "Potential import errors: " << SDL_GetError() << "\n";
+                        std::cout << drawing_surface->w << " : " << drawing_surface->h << "\n";
+                    } else {
+                        std::cout << stbi_failure_reason() << "\n";
+                    }
+
+                    // eventually free data eventually
+                    // stbi_image_free(dat);
                 }
-
-
-                Uint32 r_mask, g_mask, b_mask, a_mask;
-
-                #if SDL_BYTEORDER == SDL_BIG_ENDIAN // beeg endian
-                int shift = (req_format == STBI_rgb) ? 8 : 0;
-                r_mask = 0xff000000 >> shift;
-                g_mask = 0x00ff0000 >> shift;
-                b_mask = 0x0000ff00 >> shift;
-                a_mask = 0x000000ff >> shift;
-                #else // little endian
-                r_mask = 0x000000FF;
-                g_mask = 0x0000FF00;
-                b_mask = 0x00FF0000;
-                a_mask = (rec_channel == STBI_rgb) ? 0 : 0xFF000000;
-                #endif
-
-
-                int depth, pitch;
-
-                if (rec_channel == STBI_rgb) {
-                    depth = 24;
-                    pitch = 3 * width;
-                }
-                else {
-                    depth = 32;
-                    pitch = 4 * width;
-                }
-
-
-                if (dat)
-                {
-                    SURFACE_HEIGHT = height;
-                    SURFACE_WIDTH = width;
-
-                    //drawing_surface = SDL_CreateRGBSurfaceFrom((void*) dat, width, height, depth, pitch, r_mask, g_mask, 
-                    //    b_mask, a_mask);
-
-                    SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
-
-                    clearLayers();
-                    //for (int i = 0; i)
-
-                    Layer("Layer 1", 1.0, false);
-                    Layer("Layer 2", 1.0, false);
-
-                    layers[0].layer_data = SDL_CreateRGBSurfaceFrom((void*)dat, width, height, depth, pitch, r_mask, g_mask,
-                        b_mask, a_mask);
-
-                    std::cout << channels << "\n";
-                    std::cout << "Potential import errors: " << SDL_GetError() << "\n";
-                    std::cout << drawing_surface->w << " : " << drawing_surface->h << "\n";
-                }
-                else
-                {
-                    std::cout << stbi_failure_reason() << "\n";
-                }
-
-                // eventually free data eventually
-                //stbi_image_free(dat);
+                ImGui::EndPopup();
             }
 
+            ImGui::CloseCurrentPopup();
+            show_import_prompt = false;
             // close
             ImGuiFileDialog::Instance()->Close();
         }
@@ -339,7 +336,7 @@ int main(int, char**) {
         // destroy textures at the end of the frame as to not create any potential memory leaks
         SDL_DestroyTexture(texture);
         SDL_DestroyTexture(debug_texture);
-
+        SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
         // render ImGui
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
 

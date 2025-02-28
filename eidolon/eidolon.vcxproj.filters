@@ -80,5 +80,11 @@
     <ClInclude Include="include\src\tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\fa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IconsFontAwesome6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

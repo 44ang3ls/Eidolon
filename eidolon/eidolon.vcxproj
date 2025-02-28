@@ -145,6 +145,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\dirent.h" />
+    <ClInclude Include="include\fa.h" />
+    <ClInclude Include="include\IconsFontAwesome6.h" />
     <ClInclude Include="include\imgui\ImGuiFileDialog.h" />
     <ClInclude Include="include\imgui\ImGuiFileDialogConfig.h" />
     <ClInclude Include="include\src\globals.h" />
