@@ -24,7 +24,7 @@ unsigned int Color(unsigned int c) {
 void renderInit() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow(version_id, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     SDL_SetWindowResizable(window, SDL_bool(true));
 

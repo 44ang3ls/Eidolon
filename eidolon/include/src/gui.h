@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "imgui\imgui.h"
 #include "layers.h"
+#include "tools.h"
 #include "fa.h"
 #include "IconsFontAwesome6.h"
 
@@ -72,7 +73,7 @@ void newImagePrompt()
             // input buffers
             static char width_buffer[128] = "400";
             ImGui::InputText("Width", width_buffer, IM_ARRAYSIZE(width_buffer), 0);
-            static char height_buffer[128] = "500";
+            static char height_buffer[128] = "400";
             ImGui::InputText("Height", height_buffer, IM_ARRAYSIZE(height_buffer), 0);
 
             if (ImGui::Button("Sizes")) {
@@ -82,7 +83,7 @@ void newImagePrompt()
 
                 clearLayers();
                 // drawing_surface = SDL_CreateRGBSurfaceWithFormat(0, SURFACE_WIDTH, SURFACE_HEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
-                SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
+                //SDL_FillRect(drawing_surface, NULL, SDL_MapRGBA(drawing_surface->format, 0, 0, 0, 0));
 
                 Layer("Layer 1", 1.0, false);
 
@@ -106,7 +107,7 @@ void importPrompt() {
     }
 }
 
-void ShowTopMenuBar() {
+void showTopMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem(ICON_FA_FILE_CIRCLE_PLUS "  New")) {
@@ -125,12 +126,22 @@ void ShowTopMenuBar() {
         }
 
         if (ImGui::BeginMenu("Edit")) {
-            // Add edit options here
+            if (ImGui::MenuItem(ICON_FA_ARROW_ROTATE_LEFT "  Undo", "Ctrl+Z")) {
+                undo();
+            }
+            if (ImGui::MenuItem(ICON_FA_XMARK "  Exit")) {
+            }
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Tools")) {
-            // Add tools options here
+            for (int i = 0; i < tools.size(); i++) {
+                bool element_selected = (i == layer_index);
+
+                if (ImGui::Selectable(layers[i].name.c_str(), element_selected)) {
+                    layer_index = i;
+                }
+            }
             ImGui::EndMenu();
         }
 
@@ -204,7 +215,7 @@ void createGuiElements() {
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
 
-    ShowTopMenuBar();
+    showTopMenuBar();
     createBasicGuiElement(true, {200, 200}, {float(w), 10}, ImGuiCond_Once, ImGuiCond_Once, "Color", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, {std::bind(ImGui::ColorPicker4, "colorwheel", current_color, 0, current_color)}, 0, 1.0f);
     createBasicGuiElement(true, {130, 95}, {0, 200}, ImGuiCond_Once, ImGuiCond_Once, "Layers", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove, {std::bind(layerView)}, 0, 1.0f);
 }

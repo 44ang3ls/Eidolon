@@ -97,6 +97,11 @@ int main(int, char**) {
             if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RIGHT) {
                 dst_x += 5 * scroll_amt;
             }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_z) {
+                    undo();
+                }
+            }
 
             // Handle mouse button events
             if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
@@ -116,6 +121,8 @@ int main(int, char**) {
 
             if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
                 is_drawing = false;
+
+                addToBuff(layer_index);
             }
 
             // scrolling logic
@@ -132,7 +139,7 @@ int main(int, char**) {
 
 
                 if (event.wheel.y > 0) {
-                    scroll_amt *= 2.0;
+                    scroll_amt *= 1.75;
                 }
                 else if (event.wheel.y < 0) {
                     scroll_amt *= 0.9;
@@ -177,6 +184,7 @@ int main(int, char**) {
                     lastY = y; // update last position
 
                     std::cout << lastX << " : " << lastY << "\n";
+
                 }
             }
         }
